@@ -10,7 +10,7 @@ export class AppController {
   @Public()
   @ApiExcludeEndpoint()
   @Get()
-  getHello(): string {
+  getHello() {
     return this.appService.getHello();
   }
 }
