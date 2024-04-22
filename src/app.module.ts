@@ -1,12 +1,10 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CatsModule } from './cats/cats.module';
 
 @Module({
-  imports: [CatsModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [CacheModule.register()],
+  controllers: [AppController]
 })
 
 export class AppModule {}
