@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { type Lucid } from 'lucid-cardano';
 import { ConfigService } from '../config/config.service';
+import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import {
   createCipheriv,
   createDecipheriv,
   createHash,
-  randomBytes
+  randomBytes,
 } from 'crypto';
 
 const alg = 'aes-256-ctr';
@@ -16,10 +17,10 @@ async function getLucid(): Promise<Lucid> {
   const module = await (eval(`import('lucid-cardano')`) as Promise<any>);
   const lucid: Lucid = await module.Lucid.new(
     new module.Blockfrost(
-      ConfigService.LucidConfig.blockfrostUrl,
-      ConfigService.LucidConfig.blockfrostKey
+      ConfigService.LucidConfig.blockfrost_url,
+      ConfigService.LucidConfig.blockfrost_key,
     ),
-    ConfigService.LucidConfig.cardanoEnv
+    ConfigService.LucidConfig.cardano_env,
   );
   return lucid;
 }
@@ -28,6 +29,10 @@ export class Address {
   privateKey: string;
   address: string;
 }
+
+const API = new BlockFrostAPI({
+  projectId: ConfigService.LucidConfig.blockfrost_key,
+});
 
 @Injectable()
 export class WalletsService {
@@ -57,5 +62,10 @@ export class WalletsService {
     ).toString('hex');
     bcObj.address = address;
     return bcObj;
+  }
+
+  async getAddressBalance(address) {
+    const balance = await API.addresses(address);
+    return balance.amount;
   }
 }

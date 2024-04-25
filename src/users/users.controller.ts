@@ -9,8 +9,8 @@ import { Role } from 'src/role/role.enum';
 
 @ApiBearerAuth()
 @Controller({
-  version: '1'
-}) 
+  version: '1',
+})
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
@@ -19,12 +19,12 @@ export class UsersController {
   async findAll(): Promise<UserResponse[]> {
     const users = await this.usersService.findAll();
     const userRes: UserResponse[] = [];
-    users.forEach(x => {
+    users.forEach((x) => {
       const user = new UserResponse();
       user.id = x.id;
-      user.userName = x.userName;
-      user.firstName = x.firstName;
-      user.lastName = x.lastName;
+      user.username = x.username;
+      user.first_name = x.firstName;
+      user.last_name = x.lastName;
       user.address = x.address;
       userRes.push(user);
     });
@@ -35,20 +35,18 @@ export class UsersController {
   @Post()
   async createUser(@Body() user: UserDto): Promise<UserResponse> {
     const userData = new User();
-    userData.firstName = user.firstName;
-    userData.lastName = user.lastName;
-    userData.userName = user.userName;
+    userData.firstName = user.first_name;
+    userData.lastName = user.last_name;
+    userData.username = user.user_name;
     userData.password = user.password;
-    
     const newUser = await this.usersService.create(userData);
 
     const userRes = new UserResponse();
     userRes.id = newUser.id;
-    userRes.userName = newUser.userName;
-    userRes.firstName = newUser.firstName;
-    userRes.lastName = newUser.lastName;
+    userRes.username = newUser.username;
+    userRes.first_name = newUser.firstName;
+    userRes.last_name = newUser.lastName;
     userRes.address = newUser.address;
-
     return userRes;
   }
 }

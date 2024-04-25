@@ -8,29 +8,31 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { DbModule } from './db/db.module';
 import { SeederModule } from './seeder/seeder.module';
 import { RolesModule } from './role/roles.module';
+import { WalletsModule } from './wallets/wallets.module';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([
       {
         ttl: 6000,
-        limit: 10
-      }
+        limit: 10,
+      },
     ]),
     UsersModule,
     RouterModule.register([
       {
         path: 'users',
-        module: UsersModule
-      }
+        module: UsersModule,
+      },
     ]),
     AuthModule,
     DbModule,
     SeederModule,
-    RolesModule
+    RolesModule,
+    WalletsModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService],
 })
 
 export class AppModule {}

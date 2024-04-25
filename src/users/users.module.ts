@@ -9,7 +9,7 @@ import { WalletsService } from 'src/wallets/wallets.service';
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersService, WalletsService],
   controllers: [UsersController],
-  exports: [UsersService]
+  exports: [UsersService],
 })
 
 export class UsersModule {}

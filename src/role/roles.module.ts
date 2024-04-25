@@ -6,9 +6,9 @@ import { RolesGuard } from './roles.guard';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: RolesGuard
-    }
-  ]
+      useClass: RolesGuard,
+    },
+  ],
 })
 
 export class RolesModule {}

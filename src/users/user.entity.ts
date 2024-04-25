@@ -6,25 +6,36 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'firstName' })
+  @Column({ name: 'first_name' })
   firstName: string;
 
-  @Column({ name: 'lastName' })
+  @Column({ name: 'last_name' })
   lastName: string;
 
-  @Column({ default: true, name: 'isActive' })
+  @Column({ default: true, name: 'is_active' })
   isActive: boolean;
 
-  @Column({ nullable: false })
+  @Column({
+    nullable: false,
+  })
   password: string;
 
-  @Column({ nullable: false, unique: true })
-  userName: string;
+  @Column({
+    nullable: false,
+    unique: true,
+  })
+  username: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({
+    nullable: false,
+    unique: true,
+  })
   address: string;
 
-  @Column({ nullable: false, name: 'privateKey' })
+  @Column({
+    nullable: false,
+    name: 'private_key',
+  })
   privateKey: string;
 
   @Column({
@@ -33,7 +44,7 @@ export class User {
     type: 'enum',
     enum: ['admin', 'user'],
     enumName: 'rolesEnum',
-    default: ['user'] 
+    default: ['user'],
   })
   roles: Role[];
 }

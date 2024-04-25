@@ -13,18 +13,18 @@ import { ConfigService } from 'src/config/config.service';
     JwtModule.register({
       global: true,
       secret: ConfigService.JWTConfig.secret,
-      signOptions: { expiresIn: '600s' }
-    })
+      signOptions: { expiresIn: '600s' },
+    }),
   ],
   providers: [
     AuthService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
-    }
+      useClass: AuthGuard,
+    },
   ],
   controllers: [AuthController],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 
 export class AuthModule {}

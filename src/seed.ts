@@ -4,20 +4,20 @@ import { SeederService } from './seeder/seeder.service';
 
 async function bootstrap() {
   NestFactory.createApplicationContext(SeederModule)
-    .then(appContext => {
+    .then((appContext) => {
       const seeder = appContext.get(SeederService);
       seeder
         .seed()
         .then(() => {
           console.log('Seeding complete!');
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Seeding failed!');
           throw error;
         })
         .finally(() => appContext.close());
     })
-    .catch(error => {
+    .catch((error) => {
       throw error;
     });
 }

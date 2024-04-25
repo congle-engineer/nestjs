@@ -4,15 +4,15 @@ import { IsNotEmpty } from 'class-validator';
 export class UserDto {
   @IsNotEmpty()
   @ApiProperty()
-  userName: string;
+  user_name: string;
 
   @IsNotEmpty()
   @ApiProperty()
   password: string;
 
   @ApiProperty()
-  firstName: string;
+  first_name: string;
 
   @ApiProperty()
-  lastName: string;
+  last_name: string;
 }

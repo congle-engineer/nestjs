@@ -8,15 +8,15 @@ export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   host: ConfigService.DBConfig.host,
   port: ConfigService.DBConfig.port,
-  username: ConfigService.DBConfig.userName,
+  username: ConfigService.DBConfig.username,
   password: ConfigService.DBConfig.password,
   database: ConfigService.DBConfig.database,
   synchronize: ConfigService.DBConfig.synchronize,
-  entities: [__dirname + '/../**/*.entity{.ts,.js}']
-}
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+};
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions)]
+  imports: [TypeOrmModule.forRoot(dataSourceOptions)],
 })
 
 export class DbModule {}

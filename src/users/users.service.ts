@@ -2,23 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { WalletsService } from '../wallets/wallets.service';
 import * as bcrypt from 'bcrypt';
+import { WalletsService } from '../wallets/wallets.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private walletsService: WalletsService
+    private walletsService: WalletsService,
   ) {}
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
 
-  async findOne(userName: string): Promise<User | null> {
-    const result: User = await this.usersRepository.findOneBy({ userName });
+  async findOne(username: string): Promise<User | null> {
+    const result: User = await this.usersRepository.findOneBy({ username });
     result.privateKey = (
       await this.walletsService.decrypt(Buffer.from(result.privateKey, 'hex'))
     ).toString('utf8');
@@ -40,8 +40,8 @@ export class UsersService {
       user.address = bcObj.address;
 
       return await this.usersRepository.save(user);
-    } catch(err) {
-      console.log(err);
+    } catch (e) {
+      console.log(e);
       return null;
     }
   }
