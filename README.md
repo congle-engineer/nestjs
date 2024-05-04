@@ -1,73 +1,204 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# elabs-backend-nestjs
+elabs-backend-nestjs
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## NestJS basic concepts
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- Module is the biggest component. App has to have at least one module which is called app module. The app module has many children modules.
 
-## Description
+- Module may have: controller, service and other components (guard, middleware, ...).
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Be careful when including other modules to avoid circular dependencies.
 
+## Authentication
+
+- Use JWT token.
+
+- User login and get token, this token will be expired in 10 minutes.
+ 
 ## Installation
 
 ```bash
-$ npm install
+cd elabs-backend-nestjs/
+yarn install
+```
+
+## Environment variables
+
+This app uses postgresql, so please install postgresql from your end and set variables for .env file as below, for example:
+
+```
+DATABASE_HOST=127.0.0.1
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=elabs
+DATABASE_SYNC=1
+
+BLOCKFROST_URL=https://cardano-preprod.blockfrost.io/api/v0
+BLOCKFROST_KEY=preprodH3StnjW9yKKHB5UaDSTecHvJxyuJJFRV
+CARDANO_ENV=Preprod
+
+JWT_SECRET=Abc123@@
+
+ENCRYPT_KEY=Abc123@@
+```
+
+## Secure keys
+- Please secure the JWT_SECRET and ENCRYPT_KEY in env variables.
+    + JWT_SECRET: it is used for authorization.
+    + ENCRYPT_KEY: it is used to encrypt user's password and then save encrypted password in DB.
+
+## Seeding users
+We can init database by using seeder
+- DATABASE_SYNC = 1 -> data in table is cleaned every time when start app
+- DATABASE_SYNC = 0 -> only sync with current DB
+
+At the first time, we must set DATABASE_SYNC = 1
+
+Set admin password by this command
+
+```bash
+export ADMIN_PASS=
+```
+
+For example:
+
+```bash
+export ADMIN_PASS=123456
+```
+
+Run to init database
+
+```bash
+npm run seed
 ```
 
 ## Running the app
 
 ```bash
 # development
-$ npm run start
+yarn run start
 
 # watch mode
-$ npm run start:dev
+yarn run start:dev
 
 # production mode
-$ npm run start:prod
+yarn run start:prod
 ```
+
+## Swagger UI
+
+Open your browser and visit this url to open the swagger UI:
+
+```
+http://localhost:3000/api
+```
+
+1. Execute /auth/login to get the Bearer token
+
+The request body is as below, for example:
+
+```
+{
+  "user_name": "admin",
+  "password": "123456"  // your password from previous step 
+}
+```
+
+Result, for example:
+
+```
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTE0ZGMyZS0xYjE1LTRkOWUtOGI0OC02ZTNhZjY5MjA1ZTYiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOlsiYWRtaW4iXSwiaWF0IjoxNzEzNzYxNDUzLCJleHAiOjE3MTM3NjIwNTN9.2eqCbzfKCV6Ucq7BuqtdcunUgogIz5ATjSUqYBuIg4U"
+}
+```
+
+Click `Authorize` on the top right corner and set for the token.
+
+2. Execute /auth/profile to get the current profile
+
+Result, for example:
+
+```
+{
+  "sub": "ae14dc2e-1b15-4d9e-8b48-6e3af69205e6",
+  "username": "admin",
+  "roles": [
+    "admin"
+  ],
+  "iat": 1713761453,
+  "exp": 1713762053
+}
+```
+
+3. Execute /users (POST) to create a new user
+
+The request body is as below, for example:
+
+```
+{
+  "user_name": "congle",
+  "password": "Abc123@@",
+  "first_name": "Cong",
+  "last_name": "Le"
+}
+```
+
+Result, for example:
+
+```
+{
+  "id": "697dc60b-d769-4266-bb75-34eaff160d00",
+  "username": "congle",
+  "first_name": "Cong",
+  "last_name": "Le",
+  "address": "addr_test1vpu2e0yz2nfygmnd0vw3dx5lhj369q9vmavtj49erq9ju8c26ygd2"
+}
+```
+
+4. Execute /users (GET) to get all users
+
+## Create a new API
+
+At first, you need to have basic knowledge about nestjs by going through this doc: https://docs.nestjs.com/ (at least, please going through OVERVIEW section).
+
+Then, to create a new API, we could use the nest-cli.
+
+```bash
+nest g resource <your_module>
+```
+
+For example:
+
+```bash
+nest g resource users
+```
+
+Choose `REST API` and enter, then choose `y`
+
+It will generate a skeleton with module, controller, service, dto, entities. Then, please update all of them to meet your requirements.
 
 ## Test
 
 ```bash
 # unit tests
-$ npm run test
+yarn run test
 
 # e2e tests
-$ npm run test:e2e
+yarn run test:e2e
 
 # test coverage
-$ npm run test:cov
+yarn run test:cov
 ```
 
-## Support
+## DB migration cli
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+npm run migration:create -- <path_name>
+npm run migration:create -- ./src/db/migrations/wallet
 
-## Stay in touch
+npm run migrate
+npm run migration:down
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+When you want to revert multi files (multi version), run `npm run migration:down` multi times.
