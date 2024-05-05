@@ -64,6 +64,26 @@ export class WalletsService {
     return bcObj;
   }
 
+  async createAddressFromPrivateKey(privateKey: string) {
+    const lucid: Lucid = await getLucid();
+    lucid.selectWalletFromPrivateKey(privateKey);
+    const address = await lucid.wallet.address();
+    return address;
+  }
+
+  async createAddressFromMnemonic(mnemonic: string, index: number) {
+    const lucid: Lucid = await getLucid();
+    const address = await lucid.selectWalletFromSeed(
+      mnemonic,
+      {
+        addressType: "Base",
+        accountIndex: index
+      }
+    );
+    console.log('address: ', address);
+    return address.wallet.address();
+  }
+
   async getAddressBalance(address) {
     const balance = await API.addresses(address);
     return balance.amount;

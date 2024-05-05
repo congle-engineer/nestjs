@@ -6,6 +6,7 @@ import { UserResponse } from './user.response';
 import { User } from './user.entity';
 import { Roles } from 'src/role/roles.decorator';
 import { Role } from 'src/role/role.enum';
+// import { Public } from '../auth/auth.guard';
 
 @ApiBearerAuth()
 @Controller({
@@ -15,6 +16,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Roles(Role.Admin)
+  // @Public()
   @Get()
   async findAll(): Promise<UserResponse[]> {
     const users = await this.usersService.findAll();

@@ -9,6 +9,7 @@ import { DbModule } from './db/db.module';
 import { SeederModule } from './seeder/seeder.module';
 import { RolesModule } from './role/roles.module';
 import { WalletsModule } from './wallets/wallets.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { WalletsModule } from './wallets/wallets.module';
     DbModule,
     SeederModule,
     RolesModule,
-    WalletsModule
+    WalletsModule,
+    UtilsModule
   ],
   controllers: [AppController],
   providers: [AppService],
