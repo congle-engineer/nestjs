@@ -82,7 +82,12 @@ export class WalletsService {
   }
 
   async getAddressBalance(address) {
-    const balance = await API.addresses(address);
-    return balance.amount;
+    try {
+      const balance = await API.addresses(address);
+      return balance.amount;
+    } catch (error) {
+      console.log(`error: ${error}`);
+      return [{ unit: 'lovelace', quantity: '0' }];
+    }
   }
 }
