@@ -11,5 +11,4 @@ import { WalletsService } from 'src/wallets/wallets.service';
   controllers: [UsersController],
   exports: [UsersService],
 })
-
 export class UsersModule {}

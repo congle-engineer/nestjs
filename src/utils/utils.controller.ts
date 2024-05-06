@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UtilsService } from './utils.service';
 import { CreateUtilDto } from './dto/create-util.dto';
 import { UpdateUtilDto } from './dto/update-util.dto';
@@ -13,16 +21,16 @@ export class UtilsController {
   generateMnemonic() {
     const mnemonic = this.utilsService.generateMnemonic();
     return {
-      mnemonic: mnemonic
-    }
+      mnemonic: mnemonic,
+    };
   }
 
   @Get('/generate/privatekey')
   async generatePrivateKey() {
     const privateKey = await this.utilsService.generatePrivateKey();
     return {
-      privateKey: privateKey
-    }
+      privateKey: privateKey,
+    };
   }
 
   // @Post()

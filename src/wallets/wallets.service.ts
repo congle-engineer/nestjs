@@ -73,13 +73,10 @@ export class WalletsService {
 
   async createAddressFromMnemonic(mnemonic: string, index: number) {
     const lucid: Lucid = await getLucid();
-    const address = await lucid.selectWalletFromSeed(
-      mnemonic,
-      {
-        addressType: "Base",
-        accountIndex: index
-      }
-    );
+    const address = await lucid.selectWalletFromSeed(mnemonic, {
+      addressType: 'Base',
+      accountIndex: index,
+    });
     console.log('address: ', address);
     return address.wallet.address();
   }

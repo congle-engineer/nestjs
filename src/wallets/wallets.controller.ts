@@ -11,19 +11,24 @@ export class WalletsController {
   @Public()
   @Post('/create/address/from/mnemonic')
   async createAddressFromMnemonic(@Body() body: MnemonicDto) {
-    const address = await this.walletsService.createAddressFromMnemonic(body.mnemonic, body.index);
+    const address = await this.walletsService.createAddressFromMnemonic(
+      body.mnemonic,
+      body.index,
+    );
     return {
-      address: address
-    }
+      address: address,
+    };
   }
 
   @Public()
   @Post('/create/address/from/privatekey')
   async createAddressFromPrivateKey(@Body() body: PrivateKeyDto) {
-    const address = await this.walletsService.createAddressFromPrivateKey(body.privateKey);
+    const address = await this.walletsService.createAddressFromPrivateKey(
+      body.privateKey,
+    );
     return {
-      address: address
-    }
+      address: address,
+    };
   }
 
   @Public()
@@ -32,7 +37,7 @@ export class WalletsController {
     const balance = await this.walletsService.getAddressBalance(address);
     return {
       address: address,
-      balance: balance
-    }
+      balance: balance,
+    };
   }
 }

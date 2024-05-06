@@ -6,5 +6,4 @@ import { UtilsController } from './utils.controller';
   controllers: [UtilsController],
   providers: [UtilsService],
 })
-
 export class UtilsModule {}

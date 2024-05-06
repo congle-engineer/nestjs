@@ -7,5 +7,4 @@ import { DbModule } from 'src/db/db.module';
   providers: [SeederService],
   imports: [UsersModule, DbModule],
 })
-
 export class SeederModule {}

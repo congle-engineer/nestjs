@@ -18,5 +18,4 @@ export const dataSourceOptions: DataSourceOptions = {
 @Module({
   imports: [TypeOrmModule.forRoot(dataSourceOptions)],
 })
-
 export class DbModule {}

@@ -26,5 +26,4 @@ import { ConfigService } from 'src/config/config.service';
   controllers: [AuthController],
   exports: [AuthService],
 })
-
 export class AuthModule {}

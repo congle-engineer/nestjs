@@ -31,10 +31,9 @@ import { UtilsModule } from './utils/utils.module';
     SeederModule,
     RolesModule,
     WalletsModule,
-    UtilsModule
+    UtilsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-
 export class AppModule {}
