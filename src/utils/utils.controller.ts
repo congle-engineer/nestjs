@@ -1,15 +1,15 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  // Post,
+  // Body,
+  // Patch,
+  // Param,
+  // Delete,
 } from '@nestjs/common';
 import { UtilsService } from './utils.service';
-import { CreateUtilDto } from './dto/create-util.dto';
-import { UpdateUtilDto } from './dto/update-util.dto';
+// import { CreateUtilDto } from './dto/create-util.dto';
+// import { UpdateUtilDto } from './dto/update-util.dto';
 import { Public } from '../auth/auth.guard';
 
 @Public()
