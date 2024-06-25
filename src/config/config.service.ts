@@ -14,12 +14,6 @@ export class ConfigService {
     synchronize: process.env.DATABASE_SYNC == '1',
   };
 
-  static LucidConfig = {
-    blockfrost_url: process.env.BLOCKFROST_URL,
-    blockfrost_key: process.env.BLOCKFROST_KEY,
-    cardano_env: process.env.CARDANO_ENV,
-  };
-
   static JWTConfig = {
     secret: process.env.JWT_SECRET,
   };

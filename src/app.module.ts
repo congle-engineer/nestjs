@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { RouterModule } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DbModule } from './db/db.module';
 import { SeederModule } from './seeder/seeder.module';
-import { RolesModule } from './role/roles.module';
-import { WalletsModule } from './wallets/wallets.module';
-import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -19,19 +16,16 @@ import { UtilsModule } from './utils/utils.module';
         limit: 10,
       },
     ]),
-    UsersModule,
+    UserModule,
     RouterModule.register([
       {
-        path: 'users',
-        module: UsersModule,
+        path: 'user',
+        module: UserModule,
       },
     ]),
     AuthModule,
     DbModule,
     SeederModule,
-    RolesModule,
-    WalletsModule,
-    UtilsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
