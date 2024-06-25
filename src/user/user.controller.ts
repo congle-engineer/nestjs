@@ -30,7 +30,7 @@ export class UserController {
     userRes.firstName = newUser.firstName;
     userRes.lastName = newUser.lastName;
     userRes.isActive = newUser.isActive;
-  
+
     return userRes;
   }
 }
