@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -11,29 +11,33 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  findAll(): Promise<User[]> {
+  findAll() {
     return this.userRepository.find();
   }
 
-  async findOne(username: string): Promise<User | null> {
+  async findOne(username: string) {
     const result: User = await this.userRepository.findOneBy({ username });
     return result;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string) {
     await this.userRepository.delete(id);
   }
 
-  async create(user: User): Promise<User | null> {
+  async create(user: User) {
     try {
       const salt = await bcrypt.genSalt();
       user.password = await bcrypt.hash(user.password, salt);
       user.isActive = true;
 
+      const existUser = await this.userRepository.findOneBy({ username: user.username });
+      if (existUser) {
+        throw new HttpException('This username has already been used!', HttpStatus.BAD_REQUEST);
+      }
+
       return await this.userRepository.save(user);
     } catch (e) {
-      console.log(e);
-      return null;
+      throw new HttpException(e.response, e.status);
     }
   }
 }
