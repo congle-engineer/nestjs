@@ -2,6 +2,8 @@ import { DataSource } from 'typeorm';
 import { join } from 'path';
 import 'dotenv/config';
 
+console.log('dir: ', join(__dirname, '/migrations/**/*{.ts,.js}'));
+
 export const connectionSource = new DataSource({
   type: 'postgres',
   host: process.env.DATABASE_HOST,
@@ -14,5 +16,5 @@ export const connectionSource = new DataSource({
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [join(__dirname, '/migrations/**/*{.ts,.js}')],
   migrationsTableName: 'typeorm_migrations',
-  migrationsRun: false,
+  migrationsRun: true,
 });
