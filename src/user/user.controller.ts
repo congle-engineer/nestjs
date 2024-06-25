@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UserDto } from './user.dto';
@@ -24,7 +31,7 @@ export class UserController {
       userData.lastName = user.lastName;
 
       const newUser = await this.userService.create(userData);
-          
+
       const userRes = new UserResponse();
       userRes.id = newUser.id;
       userRes.username = newUser.username;
@@ -32,7 +39,7 @@ export class UserController {
       userRes.lastName = newUser.lastName;
       userRes.isActive = newUser.isActive;
 
-      return userRes; 
+      return userRes;
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }

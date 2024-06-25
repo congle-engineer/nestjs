@@ -31,9 +31,14 @@ export class UserService {
       user.password = await bcrypt.hash(user.password, salt);
       user.isActive = true;
 
-      const existUser = await this.userRepository.findOneBy({ username: user.username });
+      const existUser = await this.userRepository.findOneBy({
+        username: user.username,
+      });
       if (existUser) {
-        throw new HttpException(MessageService.USERNAME_ALREADY_USED, HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          MessageService.USERNAME_ALREADY_USED,
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       return await this.userRepository.save(user);
