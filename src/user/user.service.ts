@@ -2,6 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { MessageService } from 'src/message/message.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -32,7 +33,7 @@ export class UserService {
 
       const existUser = await this.userRepository.findOneBy({ username: user.username });
       if (existUser) {
-        throw new HttpException('This username has already been used!', HttpStatus.BAD_REQUEST);
+        throw new HttpException(MessageService.USERNAME_ALREADY_USED, HttpStatus.BAD_REQUEST);
       }
 
       return await this.userRepository.save(user);
