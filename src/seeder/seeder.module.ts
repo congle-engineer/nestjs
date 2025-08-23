@@ -1,10 +1,20 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { SeederService } from './seeder.service';
 import { UserModule } from 'src/user/user.module';
 import { DbModule } from 'src/db/db.module';
+import { User } from 'src/user/entity/user.entity';
+import { Network } from 'src/network/entity/network.entity';
+import { Asset } from 'src/asset/entity/asset.entity';
+import { Setting } from 'src/setting/entity/setting.entity';
+import { Contract } from 'src/contract/entity/contract.entity';
 
 @Module({
   providers: [SeederService],
-  imports: [UserModule, DbModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Network, Asset, Setting, Contract]),
+    UserModule,
+    DbModule,
+  ],
 })
 export class SeederModule {}
