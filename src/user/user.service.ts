@@ -14,8 +14,9 @@ import { SignUpDto } from './dto/signup.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 import { I18nService, I18nContext } from 'nestjs-i18n';
-import { walletFromSeed } from '@evolution-sdk/lucid';
+import { generateSeedPhrase, walletFromSeed } from '@evolution-sdk/lucid';
 import { ConfigService } from 'src/config/config.service';
+import { encryptMnemonic, decryptMnemonic } from 'src/common/crypto';
 
 export type Network = 'Mainnet' | 'Preprod' | 'Preview';
 
@@ -69,6 +70,17 @@ export class UserService {
         );
       }
 
+      const mnemonic = generateSeedPhrase();
+      user.mnemonic = encryptMnemonic(
+        mnemonic,
+        ConfigService.EncryptConfig.key,
+      );
+
+      const wallet = walletFromSeed(mnemonic, {
+        network: ConfigService.CardanoConfig.network as Network,
+      });
+      user.walletAddress = wallet.address;
+
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       user.otp = otp;
 
@@ -82,20 +94,7 @@ export class UserService {
         },
       });
 
-      await this.userRepository.save(user);
-
-      const userInfo = await this.userRepository.findOneBy({
-        username: signupDto.username,
-      });
-
-      const wallet = walletFromSeed(ConfigService.CardanoConfig.mnemonic, {
-        accountIndex: userInfo.id,
-        network: ConfigService.CardanoConfig.network as Network,
-      });
-
-      userInfo.walletAddress = wallet.address;
-
-      return await this.userRepository.save(userInfo);
+      return await this.userRepository.save(user);
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
@@ -177,6 +176,10 @@ export class UserService {
         username: user.username,
         email: user.email,
         wallet_address: user.walletAddress,
+        mnemonic: decryptMnemonic(
+          user.mnemonic,
+          ConfigService.EncryptConfig.key,
+        ),
         role: user.role,
       };
 
@@ -224,6 +227,10 @@ export class UserService {
         username: user.username,
         email: user.email,
         wallet_address: user.walletAddress,
+        mnemonic: decryptMnemonic(
+          user.mnemonic,
+          ConfigService.EncryptConfig.key,
+        ),
         role: user.role,
       };
       return {

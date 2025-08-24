@@ -27,6 +27,9 @@ export class UserResponseDto {
   email: string;
 
   @ApiProperty()
+  mnemonic: string;
+
+  @ApiProperty()
   @Expose()
   walletAddress: string;
 

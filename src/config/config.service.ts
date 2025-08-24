@@ -51,7 +51,6 @@ export class ConfigService {
   };
 
   static CardanoConfig = {
-    mnemonic: process.env.MNEMONIC || '',
     network: process.env.NETWORK || 'Mainnet',
   };
 }

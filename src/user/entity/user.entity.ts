@@ -42,6 +42,12 @@ export class User {
 
   @Column({
     nullable: true,
+    name: 'mnemonic',
+  })
+  mnemonic: string;
+
+  @Column({
+    nullable: true,
     name: 'wallet_address',
   })
   walletAddress: string;
