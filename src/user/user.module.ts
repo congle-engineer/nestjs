@@ -3,13 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { User } from './entity/user.entity';
-import { Subscriber } from './entity/subscriber.entity';
 import { Setting } from 'src/setting/entity/setting.entity';
-import { Network } from 'src/network/entity/network.entity';
-import { Asset } from 'src/asset/entity/asset.entity';
-import { Contract } from 'src/contract/entity/contract.entity';
-import { Fiat } from 'src/fiat/entity/fiat.entity';
-import { FiatLoan } from './entity/fiat-loan.entity';
+// import { Project } from 'src/project/entity/project.entity';
+import { Nonce } from 'src/user/entity/nonce.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from 'src/config/config.service';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -18,16 +14,7 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Setting,
-      User,
-      Subscriber,
-      Network,
-      Asset,
-      Contract,
-      FiatLoan,
-      Fiat,
-    ]),
+    TypeOrmModule.forFeature([Setting, User, Nonce]),
     JwtModule.register({
       global: true,
       secret: ConfigService.JWTConfig.secret,

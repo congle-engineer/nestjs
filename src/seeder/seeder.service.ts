@@ -38,15 +38,21 @@ export class SeederService {
       user.username = 'admin';
       const salt = await bcrypt.genSalt();
       user.password = await bcrypt.hash(ConfigService.Admin.password, salt);
+      user.firstName = 'admin';
+      user.lastName = 'admin';
+      user.walletAddress = null;
       user.role = Role.Admin;
       user.email = 'congle@emurgo.africa';
       user.emailVerified = true;
       user.isActive = true;
 
+      console.log('seed 1');
+
       const existUser = await this.userRepository.findOneBy({
         username: user.username,
       });
       if (!existUser) {
+        console.log('seed 2');
         await this.userRepository.save(user);
       }
 

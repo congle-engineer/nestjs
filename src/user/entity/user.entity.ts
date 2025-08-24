@@ -24,9 +24,27 @@ export class User {
 
   @Column({
     nullable: false,
+    name: 'first_name',
+  })
+  firstName: string;
+
+  @Column({
+    nullable: false,
+    name: 'last_name',
+  })
+  lastName: string;
+
+  @Column({
+    nullable: false,
     unique: true,
   })
   email: string;
+
+  @Column({
+    nullable: true,
+    name: 'wallet_address',
+  })
+  walletAddress: string;
 
   @Column({
     default: false,
@@ -41,9 +59,8 @@ export class User {
 
   @Column({
     nullable: true,
-    name: 'encryptus_id',
   })
-  encryptusId: string;
+  otp: string;
 
   @Column({
     default: true,

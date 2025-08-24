@@ -40,7 +40,7 @@ export class TaskService {
     @InjectBot() private bot: Telegraf<any>,
   ) {}
 
-  @Cron(ConfigService.Cronjob.updateEncryptusToken)
+  //@Cron(ConfigService.Cronjob.updateEncryptusToken)
   async handleUpdateEncryptusToken() {
     try {
       this.logger.log('Called every 1 hour to update encryptus token');
@@ -70,7 +70,7 @@ export class TaskService {
     }
   }
 
-  @Cron(ConfigService.Cronjob.updateCryptoPrice)
+  //@Cron(ConfigService.Cronjob.updateCryptoPrice)
   async handleUpdateCryptoPrice() {
     try {
       this.logger.log('Called every 1 minute to update all crypto prices');
@@ -107,7 +107,7 @@ export class TaskService {
     }
   }
 
-  @Cron(ConfigService.Cronjob.checkLiquidation)
+  //@Cron(ConfigService.Cronjob.checkLiquidation)
   async handleCheckLiquidation() {
     try {
       const ccfl = await this.contractRepository.findOneBy({
@@ -214,7 +214,7 @@ export class TaskService {
     }
   }
 
-  @Cron(ConfigService.Cronjob.updateFiatPrice)
+  //@Cron(ConfigService.Cronjob.updateFiatPrice)
   async handleUpdateFiatPrice() {
     try {
       this.logger.log('Called every 30 minutes to update all fiat prices');
