@@ -9,18 +9,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { Setting } from 'src/setting/entity/setting.entity';
-// import { Project } from 'src/project/entity/project.entity';
 import { User } from './entity/user.entity';
-import { Nonce } from './entity/nonce.entity';
-import { SignUpDto } from './dto/sign-up.dto';
+import { SignUpDto } from './dto/signup.dto';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from 'src/config/config.service';
 import * as bcrypt from 'bcrypt';
 import { I18nService, I18nContext } from 'nestjs-i18n';
-import { ethers } from 'ethers';
-import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -29,17 +22,8 @@ export class UserService {
     private jwtService: JwtService,
     private readonly emailService: MailerService,
 
-    @InjectRepository(Setting)
-    private settingRepository: Repository<Setting>,
-
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-    @InjectRepository(Nonce)
-    private nonceRepository: Repository<Nonce>,
-
-    // @InjectRepository(Project)
-    // private projectRepository: Repository<Project>,
 
     private readonly i18n: I18nService,
   ) {}
@@ -60,11 +44,6 @@ export class UserService {
         username: user.username,
       });
       if (existUser) {
-        this.logger.error(
-          this.i18n.translate('message.USERNAME_ALREADY_USED', {
-            lang: I18nContext.current().lang,
-          }),
-        );
         throw new HttpException(
           this.i18n.translate('message.USERNAME_ALREADY_USED', {
             lang: I18nContext.current().lang,
@@ -77,11 +56,6 @@ export class UserService {
         email: user.email,
       });
       if (existEmail) {
-        this.logger.error(
-          this.i18n.translate('message.EMAIL_ALREADY_USED', {
-            lang: I18nContext.current().lang,
-          }),
-        );
         throw new HttpException(
           this.i18n.translate('message.EMAIL_ALREADY_USED', {
             lang: I18nContext.current().lang,
@@ -95,8 +69,8 @@ export class UserService {
 
       await this.emailService.sendMail({
         to: user.email,
-        subject: `Welcome to the TGE application`,
-        template: './confirmation-otp',
+        subject: `Welcome to the RELOOP application`,
+        template: './signup-confirm-otp',
         context: {
           username: user.username,
           otp,
@@ -115,8 +89,22 @@ export class UserService {
         email,
       });
 
-      if (!user || user?.otp != otp) {
-        return false;
+      if (!user) {
+        throw new HttpException(
+          this.i18n.translate('message.EMAIL_NOT_FOUND', {
+            lang: I18nContext.current().lang,
+          }),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (user?.otp != otp) {
+        throw new HttpException(
+          this.i18n.translate('message.OTP_IS_INVALID', {
+            lang: I18nContext.current().lang,
+          }),
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await this.userRepository.update(
@@ -127,18 +115,26 @@ export class UserService {
         },
       );
 
-      return true;
+      return {
+        result: true,
+      };
     } catch (e) {
-      this.logger.error(
-        `${this.i18n.translate('message.CANNOT_VERIFY_EMAIL', { lang: I18nContext.current().lang })}: ${e.message}`,
-      );
-      return false;
+      throw new HttpException(e.response, e.status);
     }
   }
 
   async signIn(username: string, password: string) {
     try {
       const user = await this.userRepository.findOneBy({ username });
+
+      if (!user) {
+        throw new UnauthorizedException(
+          this.i18n.translate('message.USER_NOT_FOUND', {
+            lang: I18nContext.current().lang,
+          }),
+        );
+      }
+
       if (user?.emailVerified == false) {
         throw new UnauthorizedException(
           this.i18n.translate('message.EMAIL_NOT_VERIFIED', {
@@ -146,16 +142,26 @@ export class UserService {
           }),
         );
       }
+
       if (user?.password) {
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) throw new UnauthorizedException();
+        if (!isMatch) {
+          throw new UnauthorizedException(
+            this.i18n.translate('message.WRONG_SIGNIN_USERNAME', {
+              lang: I18nContext.current().lang,
+            }),
+          );
+        }
       }
+
       const payload = {
+        id: user.id,
         username: user.username,
         email: user.email,
+        wallet_address: user.walletAddress,
         role: user.role,
       };
-      console.log('payload: ', payload);
+
       return {
         access_token: await this.jwtService.signAsync(payload),
       };
@@ -167,6 +173,15 @@ export class UserService {
   async signInWithEmail(email: string, password: string) {
     try {
       const user = await this.userRepository.findOneBy({ email });
+
+      if (!user) {
+        throw new UnauthorizedException(
+          this.i18n.translate('message.EMAIL_NOT_FOUND', {
+            lang: I18nContext.current().lang,
+          }),
+        );
+      }
+
       if (user?.emailVerified == false) {
         throw new UnauthorizedException(
           this.i18n.translate('message.EMAIL_NOT_VERIFIED', {
@@ -174,14 +189,23 @@ export class UserService {
           }),
         );
       }
+
       if (user?.password) {
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) throw new UnauthorizedException();
+        if (!isMatch) {
+          throw new UnauthorizedException(
+            this.i18n.translate('message.WRONG_SIGNIN_EMAIL', {
+              lang: I18nContext.current().lang,
+            }),
+          );
+        }
       }
+
       const payload = {
         id: user.id,
         username: user.username,
         email: user.email,
+        wallet_address: user.walletAddress,
         role: user.role,
       };
       return {
@@ -198,7 +222,7 @@ export class UserService {
 
       if (!user) {
         throw new NotFoundException(
-          this.i18n.translate('message.USER_NOT_FOUND', {
+          this.i18n.translate('message.EMAIL_NOT_FOUND', {
             lang: I18nContext.current().lang,
           }),
         );
@@ -209,7 +233,7 @@ export class UserService {
 
       await this.emailService.sendMail({
         to: user.email,
-        subject: `Restore your password`,
+        subject: `Reset your password on RELOOP application`,
         template: './forgot-password-otp',
         context: {
           username: user.username,
@@ -224,10 +248,11 @@ export class UserService {
         },
       );
 
-      return true;
+      return {
+        result: true,
+      };
     } catch (e) {
-      this.logger.error(`[sendForgotPasswordLink], error: ${e.message}`);
-      return false;
+      throw new HttpException(e.response, e.status);
     }
   }
 
@@ -235,9 +260,13 @@ export class UserService {
     try {
       const exist = await this.userRepository.findOneBy({ username });
       if (exist) {
-        return true;
+        return {
+          result: true,
+        };
       }
-      return false;
+      return {
+        result: false,
+      };
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
@@ -247,66 +276,66 @@ export class UserService {
     try {
       const exist = await this.userRepository.findOneBy({ email });
       if (exist) {
-        return true;
+        return {
+          result: true,
+        };
       }
-      return false;
+      return {
+        result: false,
+      };
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
   }
 
-  async checkOldPassword(username: string, password: string) {
+  async changePassword(
+    username: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
     try {
       const user = await this.userRepository.findOneBy({ username });
 
-      if (user?.password) {
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (isMatch) {
-          return true;
-        }
-        return false;
+      if (!user) {
+        throw new NotFoundException(
+          this.i18n.translate('message.USER_NOT_FOUND', {
+            lang: I18nContext.current().lang,
+          }),
+        );
       }
 
-      return false;
+      if (user?.password) {
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (isMatch) {
+          const salt = await bcrypt.genSalt();
+          const newPass = await bcrypt.hash(newPassword, salt);
+
+          await this.userRepository.update(
+            { email: user.email },
+            {
+              password: newPass,
+            },
+          );
+
+          return {
+            result: true,
+          };
+        } else {
+          throw new NotFoundException(
+            this.i18n.translate('message.WRONG_CURRENT_PASSWORD', {
+              lang: I18nContext.current().lang,
+            }),
+          );
+        }
+      } else {
+        throw new NotFoundException(
+          this.i18n.translate('message.USER_NOT_FOUND', {
+            lang: I18nContext.current().lang,
+          }),
+        );
+      }
     } catch (e) {
       throw new HttpException(e.response, e.status);
-    }
-  }
-
-  async changePassword(token: string, password: string) {
-    try {
-      const { email } = this.jwtService.verify(token, {
-        secret: ConfigService.JWTConfig.secret,
-      });
-
-      if (email == null || email == undefined) {
-        return false;
-      }
-
-      const user = await this.userRepository.findOneBy({
-        email,
-      });
-
-      if (!user) {
-        return false;
-      }
-
-      const salt = await bcrypt.genSalt();
-      const newPassword = await bcrypt.hash(password, salt);
-
-      await this.userRepository.update(
-        { email },
-        {
-          password: newPassword,
-        },
-      );
-
-      return true;
-    } catch (e) {
-      this.logger.error(
-        `${this.i18n.translate('message.CANNOT_CHANGE_PASSWORD', { lang: I18nContext.current().lang })}: ${e.message}`,
-      );
-      return false;
     }
   }
 
@@ -316,8 +345,20 @@ export class UserService {
         username,
       });
 
-      if (!user || user?.otp != otp) {
-        return false;
+      if (!user) {
+        throw new NotFoundException(
+          this.i18n.translate('message.USER_NOT_FOUND', {
+            lang: I18nContext.current().lang,
+          }),
+        );
+      }
+
+      if (user?.otp != otp) {
+        throw new NotFoundException(
+          this.i18n.translate('message.OTP_IS_INVALID', {
+            lang: I18nContext.current().lang,
+          }),
+        );
       }
 
       const salt = await bcrypt.genSalt();
@@ -331,12 +372,11 @@ export class UserService {
         },
       );
 
-      return true;
+      return {
+        result: true,
+      };
     } catch (e) {
-      this.logger.error(
-        `${this.i18n.translate('message.CANNOT_RESET_PASSWORD', { lang: I18nContext.current().lang })}: ${e.message}`,
-      );
-      return false;
+      throw new HttpException(e.response, e.status);
     }
   }
 

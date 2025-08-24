@@ -3,9 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { User } from './entity/user.entity';
-import { Setting } from 'src/setting/entity/setting.entity';
-// import { Project } from 'src/project/entity/project.entity';
-import { Nonce } from 'src/user/entity/nonce.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from 'src/config/config.service';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -14,7 +11,7 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Setting, User, Nonce]),
+    TypeOrmModule.forFeature([User]),
     JwtModule.register({
       global: true,
       secret: ConfigService.JWTConfig.secret,

@@ -1,12 +1,12 @@
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class VerifySignatureDto {
+export class ChangePasswordDto {
   @ApiProperty()
   @IsNotEmpty()
-  address: string;
+  currentPassword: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  signature: string;
+  newPassword: string;
 }

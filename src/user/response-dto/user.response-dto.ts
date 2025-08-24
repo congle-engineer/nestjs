@@ -4,7 +4,8 @@ import { Exclude, Expose } from 'class-transformer';
 @Exclude()
 export class UserResponseDto {
   @ApiProperty()
-  id: string;
+  @Expose()
+  id: number;
 
   @ApiProperty()
   @Expose()
@@ -33,7 +34,6 @@ export class UserResponseDto {
   emailVerified: boolean;
 
   @ApiProperty()
-  @Expose()
   role: string;
 
   @ApiProperty()
