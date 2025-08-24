@@ -57,6 +57,30 @@ export class UserController {
     }
   }
 
+  @ApiTags('Check')
+  @Public()
+  @ApiOperation({ summary: 'Check existing username' })
+  @Post('check/username')
+  checkExistingUsername(@Body() { username }: UsernameDto) {
+    try {
+      return this.userService.checkExistingUsername(username);
+    } catch (e) {
+      throw new HttpException(e.response, e.status);
+    }
+  }
+
+  @ApiTags('Check')
+  @Public()
+  @ApiOperation({ summary: 'Check existing email' })
+  @Post('check/email')
+  checkExistingEmail(@Body() { email }: EmailDto) {
+    try {
+      return this.userService.checkExistingEmail(email);
+    } catch (e) {
+      throw new HttpException(e.response, e.status);
+    }
+  }
+
   @ApiTags('Sign in')
   @Public()
   @ApiOperation({ summary: 'Sign in' })
@@ -106,30 +130,6 @@ export class UserController {
     try {
       const allUsers = await this.userService.findAllUser();
       return plainToInstance(UserResponseDto, allUsers);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @ApiTags('Check')
-  @Public()
-  @ApiOperation({ summary: 'Check existing username' })
-  @Post('check/username')
-  checkExistingUsername(@Body() { username }: UsernameDto) {
-    try {
-      return this.userService.checkExistingUsername(username);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @ApiTags('Check')
-  @Public()
-  @ApiOperation({ summary: 'Check existing email' })
-  @Post('check/email')
-  checkExistingEmail(@Body() { email }: EmailDto) {
-    try {
-      return this.userService.checkExistingEmail(email);
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }

@@ -14,6 +14,11 @@ import { SignUpDto } from './dto/signup.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 import { I18nService, I18nContext } from 'nestjs-i18n';
+import { walletFromSeed } from '@evolution-sdk/lucid';
+import { ConfigService } from 'src/config/config.service';
+
+export type Network = 'Mainnet' | 'Preprod' | 'Preview';
+
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -77,7 +82,20 @@ export class UserService {
         },
       });
 
-      return await this.userRepository.save(user);
+      await this.userRepository.save(user);
+
+      const userInfo = await this.userRepository.findOneBy({
+        username: signupDto.username,
+      });
+
+      const wallet = walletFromSeed(ConfigService.CardanoConfig.mnemonic, {
+        accountIndex: userInfo.id,
+        network: ConfigService.CardanoConfig.network as Network,
+      });
+
+      userInfo.walletAddress = wallet.address;
+
+      return await this.userRepository.save(userInfo);
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }

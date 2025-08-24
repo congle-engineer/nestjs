@@ -49,4 +49,9 @@ export class ConfigService {
     password: process.env.MAIL_PASSWORD,
     from: process.env.MAIL_FROM,
   };
+
+  static CardanoConfig = {
+    mnemonic: process.env.MNEMONIC || '',
+    network: process.env.NETWORK || 'Mainnet',
+  };
 }
