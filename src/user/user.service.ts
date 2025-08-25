@@ -146,7 +146,7 @@ export class UserService {
 
       if (!user) {
         throw new UnauthorizedException(
-          this.i18n.translate('message.USER_NOT_FOUND', {
+          this.i18n.translate('message.WRONG_SIGNIN_USERNAME', {
             lang: I18nContext.current().lang,
           }),
         );
@@ -197,7 +197,7 @@ export class UserService {
 
       if (!user) {
         throw new UnauthorizedException(
-          this.i18n.translate('message.EMAIL_NOT_FOUND', {
+          this.i18n.translate('message.WRONG_SIGNIN_EMAIL', {
             lang: I18nContext.current().lang,
           }),
         );

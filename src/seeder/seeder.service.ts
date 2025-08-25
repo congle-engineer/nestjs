@@ -26,7 +26,7 @@ export class SeederService {
       user.lastName = 'admin';
       user.walletAddress = null;
       user.role = Role.Admin;
-      user.email = 'congle@emurgo.africa';
+      user.email = ConfigService.Mail.user;
       user.emailVerified = true;
       user.isActive = true;
 
