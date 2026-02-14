@@ -3,137 +3,61 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   Request,
   HttpException,
-  Render,
   UseGuards,
-  Param,
-  Redirect,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import {
-  ApiBearerAuth,
-  ApiExcludeEndpoint,
-  ApiTags,
-  ApiOperation,
-  ApiQuery,
-} from '@nestjs/swagger';
-import { SignUpDto } from './dto/sign-up.dto';
-import { SignInDto } from './dto/sign-in.dto';
-import { SignInEmailDto } from './dto/sign-in-email.dto';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { SignUpDto } from './dto/signup.dto';
+import { SignInDto } from './dto/signin.dto';
+import { SignInEmailDto } from './dto/signin-email.dto';
 import { EmailDto } from './dto/email.dto';
+import { ConfirmOtpDto } from './dto/confirm-otp.dto';
 import { UsernameDto } from './dto/username.dto';
-import { RestorePasswordDto } from './dto/restore-password.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { FiatLoanDto } from './dto/fiat-loan.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Roles } from 'src/role/role.decorator';
 import { Role } from 'src/role/role.enum';
-import { mapUser } from './response-dto/user.map';
-import { mapSubscriber } from './response-dto/subscriber.map';
-import { mapFiatLoan } from './response-dto/fiat-loan.map';
-import { IntDefaultValuePipe } from 'src/common/pipes/int-default-value.pipe';
+import { UserResponseDto } from './response-dto/user.response-dto';
+import { plainToInstance } from 'class-transformer';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
-@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiTags('Sign up')
   @Public()
-  @ApiOperation({ summary: 'Sign up for new user' })
+  @ApiOperation({ summary: 'Sign up for new user with OTP to verify email' })
   @Post('signup')
   async signUp(@Body() signupDto: SignUpDto) {
     try {
       const newUser = await this.userService.signUp(signupDto);
-      return mapUser(newUser);
+      return plainToInstance(UserResponseDto, newUser);
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
   }
 
+  @ApiTags('Sign up')
   @Public()
-  @ApiOperation({ summary: 'Sign in' })
-  @Post('signin')
-  async signIn(@Body() signinDto: SignInDto) {
+  @ApiOperation({ summary: 'Verify email with OTP' })
+  @Post('confirm-otp')
+  async confirmOtp(@Body() otpDto: ConfirmOtpDto) {
     try {
-      return await this.userService.signIn(
-        signinDto.username,
-        signinDto.password,
+      const result = await this.userService.confirmOtp(
+        otpDto.email,
+        otpDto.otp,
       );
+      return result;
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
   }
 
-  @Public()
-  @ApiOperation({ summary: 'Sign in with email' })
-  @Post('signin/email')
-  async signInWithEmail(@Body() signinEmailDto: SignInEmailDto) {
-    try {
-      return await this.userService.signInWithEmail(
-        signinEmailDto.email,
-        signinEmailDto.password,
-      );
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: 'Refresh token' })
-  @Post('refresh-token')
-  async refreshToken(@Body() { refreshToken }: RefreshTokenDto) {
-    try {
-      return await this.userService.refreshToken(refreshToken);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiExcludeEndpoint()
-  @Get('verify-email')
-  @Redirect()
-  verifyEmail(@Query('token') token: string) {
-    try {
-      return this.userService.verifyEmail(token);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: 'Forgot password' })
-  @Post('forgot-password')
-  sendForgotPasswordLink(@Body() { email }: EmailDto) {
-    try {
-      return this.userService.sendForgotPasswordLink(email);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiExcludeEndpoint()
-  @Get('restore-password')
-  @Render('restore-password')
-  renderRestorePassword(@Query('token') token: string) {
-    return { token };
-  }
-
-  @Public()
-  @ApiOperation({ summary: 'Change current password' })
-  @Post('change-password')
-  changePassword(@Body() { token, password }: RestorePasswordDto) {
-    try {
-      return this.userService.changePassword(token, password);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
+  @ApiTags('Check')
   @Public()
   @ApiOperation({ summary: 'Check existing username' })
   @Post('check/username')
@@ -145,6 +69,7 @@ export class UserController {
     }
   }
 
+  @ApiTags('Check')
   @Public()
   @ApiOperation({ summary: 'Check existing email' })
   @Post('check/email')
@@ -156,33 +81,46 @@ export class UserController {
     }
   }
 
-  @ApiOperation({ summary: 'Check old password' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard)
-  @Post('check/old-password')
-  checkOldPassword(@Body() signinDto: SignInDto) {
+  @ApiTags('Sign in')
+  @Public()
+  @ApiOperation({ summary: 'Sign in' })
+  @Post('signin')
+  signIn(@Body() signinDto: SignInDto) {
     try {
-      return this.userService.checkOldPassword(
-        signinDto.username,
-        signinDto.password,
+      return this.userService.signIn(signinDto.username, signinDto.password);
+    } catch (e) {
+      throw new HttpException(e.response, e.status);
+    }
+  }
+
+  @ApiTags('Sign in')
+  @Public()
+  @ApiOperation({ summary: 'Sign in with email' })
+  @Post('signin/email')
+  signInWithEmail(@Body() signinEmailDto: SignInEmailDto) {
+    try {
+      return this.userService.signInWithEmail(
+        signinEmailDto.email,
+        signinEmailDto.password,
       );
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
   }
 
+  @ApiTags('User profile')
   @ApiOperation({ summary: 'Get user profile' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Get('profile')
-  async getProfile(@Request() req) {
-    try {
-      return await this.userService.getProfile(req.user);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
+  getProfile(@Request() req) {
+    delete req.user.iat;
+    delete req.user.exp;
+    delete req.user.role;
+    return req.user;
   }
 
+  @ApiTags('All users')
   @ApiOperation({ summary: 'Get all users' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
@@ -191,141 +129,51 @@ export class UserController {
   async findAllUser() {
     try {
       const allUsers = await this.userService.findAllUser();
-      return mapUser(allUsers);
+      return plainToInstance(UserResponseDto, allUsers);
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }
   }
 
-  @Public()
-  @ApiOperation({ summary: "Get all user's supplies" })
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard)
-  @Get(':address/:chainId/supply')
-  async getAllSupply(
-    @Param('address') address: string,
-    @Param('chainId') chainId: number,
-  ) {
-    try {
-      const allSupply = await this.userService.getAllSupply(address, chainId);
-      return allSupply;
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: "Get all user's loans" })
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard)
-  @ApiQuery({
-    name: 'offset',
-    type: Number,
-    required: false,
-  })
-  @ApiQuery({
-    name: 'limit',
-    type: Number,
-    required: false,
-  })
-  @Get(':address/:chainId/loan')
-  async getAllLoan(
-    @Param('address') address: string,
-    @Param('chainId') chainId: number,
-    @Query('offset', new IntDefaultValuePipe(0)) offset: number,
-    @Query('limit', new IntDefaultValuePipe(10)) limit: number,
-  ) {
-    try {
-      const allLoan = await this.userService.getAllLoan(
-        address,
-        chainId,
-        offset,
-        limit,
-      );
-      return allLoan;
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: "Get all user's balance" })
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard)
-  @Get(':address/:chainId/:asset/balance')
-  async getBalance(
-    @Param('address') address: string,
-    @Param('chainId') chainId: number,
-    @Param('asset') asset: string,
-  ) {
-    try {
-      const addressBalance = await this.userService.getBalance(
-        address,
-        chainId,
-        asset,
-      );
-      return addressBalance;
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: 'Subscribe' })
-  @Post('subscribe')
-  async sendSubscribeEmail(@Body() { email }: EmailDto) {
-    try {
-      const result = await this.userService.sendSubscribeEmail(email);
-      return mapSubscriber(result);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiExcludeEndpoint()
-  @Get('confirm-unsubscribe')
-  @Render('confirm-unsubscribe')
-  renderConfirmUnsubscribe(@Query('token') token: string) {
-    try {
-      return this.userService.unsubscribe(token);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: 'Get all subscribers' })
-  @Get('subscribe/all')
-  async getAllSubscribers() {
-    try {
-      const result = await this.userService.getAllSubscribers();
-      return result;
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @Public()
-  @ApiOperation({ summary: 'Save info of the fiat loan' })
-  @Post('fiat/loan/create')
-  async createFiatLoan(@Body() fiatLoanDto: FiatLoanDto) {
-    try {
-      const result = await this.userService.createFiatLoan(fiatLoanDto);
-      return mapFiatLoan(result);
-    } catch (e) {
-      throw new HttpException(e.response, e.status);
-    }
-  }
-
-  @ApiOperation({ summary: 'Get the list of fiat loan' })
+  @ApiTags('Change password')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Get('fiat/loan/all')
-  async getFiatLoan(@Request() req) {
+  @ApiOperation({ summary: 'Change current password' })
+  @Post('change-password')
+  changePassword(
+    @Request() req,
+    @Body() { currentPassword, newPassword }: ChangePasswordDto,
+  ) {
     try {
-      const result = await this.userService.getFiatLoan(req.user.encryptus_id);
-      return mapFiatLoan(result);
+      return this.userService.changePassword(
+        req.user.username,
+        currentPassword,
+        newPassword,
+      );
+    } catch (e) {
+      throw new HttpException(e.response, e.status);
+    }
+  }
+
+  @ApiTags('Forgot password')
+  @Public()
+  @ApiOperation({ summary: 'Forgot password' })
+  @Post('forgot-password')
+  sendForgotPasswordLink(@Body() { email }: EmailDto) {
+    try {
+      return this.userService.sendForgotPasswordOtp(email);
+    } catch (e) {
+      throw new HttpException(e.response, e.status);
+    }
+  }
+
+  @ApiTags('Forgot password')
+  @Public()
+  @ApiOperation({ summary: 'Reset password' })
+  @Post('reset-password')
+  resetPassword(@Body() { username, password, otp }: ResetPasswordDto) {
+    try {
+      return this.userService.resetPassword(username, password, otp);
     } catch (e) {
       throw new HttpException(e.response, e.status);
     }

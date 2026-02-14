@@ -1,19 +1,19 @@
 {
   "HELLO": "Hello",
   "WELCOME": "Welcome to our application!",
+
   "USERNAME_ALREADY_USED": "Username existed!",
   "EMAIL_ALREADY_USED": "Email existed!",
-  "EMAIL_NOT_VERIFIED": "Email has not been verified",
-  "CANNOT_VERIFY_EMAIL": "Cannot verify email",
+
   "USER_NOT_FOUND": "User not found",
-  "NETWORK_NOT_FOUND": "Network not found",
+  "EMAIL_NOT_FOUND": "Email not found",
+
+  "OTP_IS_INVALID": "OTP is invalid",
+
+  "EMAIL_NOT_VERIFIED": "Email has not been verified",
+
   "WRONG_SIGNIN_USERNAME": "Incorrect username or password!",
   "WRONG_SIGNIN_EMAIL": "Incorrect email or password!",
-  "CANNOT_CHANGE_PASSWORD": "Cannot change password",
-  "EMAIL_ALREADY_SUBSCRIBED": "This email has been subscribed already",
-  "EMAIL_NOT_FOUND": "Email not found",
-  "EMAIL_ALREADY_UNSUBSCRIBED": "This email has been unsubscribed already",
-  "ENCRYPTUS_USER_ALREADY_EXIST": "This encryptus user is already exist",
-  "INVALID_REFRESH_TOKEN": "Refresh token is invalid",
-  "EXPIRED_REFRESH_TOKEN": "Refresh token is expired"
+
+  "WRONG_CURRENT_PASSWORD": "Wrong current password!"
 }

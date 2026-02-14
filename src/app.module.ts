@@ -11,22 +11,7 @@ import { ConfigService } from './config/config.service';
 import { RoleModule } from './role/role.module';
 import { LoggerMiddleware } from 'src/common/middleware/logger.middleware';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TaskModule } from './task/task.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-ioredis-yet';
-import { EventModule } from './event/event.module';
-import { SettingModule } from './setting/setting.module';
-import { NetworkModule } from './network/network.module';
-import { AssetModule } from './asset/asset.module';
 import { UserModule } from './user/user.module';
-import { ContractModule } from './contract/contract.module';
-import { PoolModule } from './pool/pool.module';
-import { SubgraphModule } from './subgraph/subgraph.module';
-import { PriceModule } from './price/price.module';
-import { FiatModule } from './fiat/fiat.module';
-import { EncryptusModule } from './encryptus/encryptus.module';
-import { CardanoModule } from './cardano/cardano.module';
-import { TelegrafModule } from 'nestjs-telegraf';
 import {
   I18nModule,
   AcceptLanguageResolver,
@@ -48,28 +33,7 @@ import * as path from 'path';
     SeederModule,
     AuthModule,
     RoleModule,
-    CacheModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: async () => ({
-        isGlobal: true,
-        store: await redisStore({
-          connectionName: 'ccfl-evm-api',
-          host: ConfigService.Redis.host,
-          port: ConfigService.Redis.port,
-          username: ConfigService.Redis.username,
-          password: ConfigService.Redis.password,
-          db: ConfigService.Redis.dbNum,
-        }),
-      }),
-      inject: [ConfigService],
-    }),
-    TelegrafModule.forRoot({
-      token: ConfigService.Telegram.token,
-    }),
     ScheduleModule.forRoot(),
-    TaskModule,
-    EventModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -83,16 +47,6 @@ import * as path from 'path';
       ],
     }),
     UserModule,
-    PoolModule,
-    PriceModule,
-    FiatModule,
-    AssetModule,
-    SubgraphModule,
-    EncryptusModule,
-    SettingModule,
-    ContractModule,
-    NetworkModule,
-    CardanoModule,
   ],
   controllers: [AppController],
   providers: [
