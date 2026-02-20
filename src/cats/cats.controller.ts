@@ -6,26 +6,35 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  HttpCode,
+  Header,
+  Redirect,
+  Query,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
+import type { Request } from 'express';
 
 @Controller('cats')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   @Post()
+  @HttpCode(204)
+  @Header('Cache-Control', 'no-store')
   create(@Body() createCatDto: CreateCatDto) {
     return this.catsService.create(createCatDto);
   }
 
   @Get()
-  findAll() {
+  findAll(@Query('age') age: number, @Query('breed') breed: string) {
     return this.catsService.findAll();
   }
 
   @Get(':id')
+  @Redirect('https://nestjs.com', 301)
   findOne(@Param('id') id: string) {
     return this.catsService.findOne(+id);
   }
