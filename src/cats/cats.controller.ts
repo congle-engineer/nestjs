@@ -11,6 +11,9 @@ import {
   Header,
   Redirect,
   Query,
+  HttpException,
+  HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
@@ -30,13 +33,28 @@ export class CatsController {
 
   @Get()
   findAll(@Query('age') age: number, @Query('breed') breed: string) {
-    return this.catsService.findAll();
+    // return this.catsService.findAll();
+    // throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    try {
+      return this.catsService.findAll();
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          error: 'This is a custom message',
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   @Get(':id')
-  @Redirect('https://nestjs.com', 301)
-  findOne(@Param('id') id: string) {
-    return this.catsService.findOne(+id);
+  // @Redirect('https://nestjs.com', 301)
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.catsService.findOne(id);
   }
 
   @Patch(':id')
